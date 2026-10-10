@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -24,7 +23,7 @@ model Transaction {
   id          String   @id @default(uuid()) @db.Uuid
   userId      String   @db.Uuid @map("user_id")
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  type        String   // income | expense
+  type        String
   amount      Decimal  @db.Decimal(12, 2)
   category    String
   description String?
@@ -35,8 +34,4 @@ model Transaction {
   @@index([userId, date])
   @@index([userId, category])
   @@map("transactions")
-}
-
-datasource db {
-  provider = "postgresql"
 }
