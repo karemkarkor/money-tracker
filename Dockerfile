@@ -7,14 +7,17 @@ WORKDIR /app
 
 COPY package*.json ./
 COPY prisma ./prisma
-COPY src ./src
-COPY public ./public
 
+# Install dependencies
 RUN npm ci
 
-# Prisma Client generation
+# Generate Prisma Client
 ENV DATABASE_URL="postgresql://user:password@localhost:5432/placeholder"
 RUN npx prisma generate
+
+# Copy application files
+COPY src ./src
+COPY public ./public
 
 # Remove development dependencies
 RUN npm prune --omit=dev
@@ -29,7 +32,7 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
-# Dependencies
+# Production dependencies
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 
 # Application files
@@ -38,7 +41,6 @@ COPY --from=build --chown=node:node /app/prisma ./prisma
 COPY --from=build --chown=node:node /app/src ./src
 COPY --from=build --chown=node:node /app/public ./public
 
-# Run as non-root
 USER node
 
 EXPOSE 3000
